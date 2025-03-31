@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { Button } from '../components/ui/Button'
+import { Button } from '../components/ui/button'
 import { QUIZ_CONSTANTS } from '../constants/quiz'
 
 interface LocationState {

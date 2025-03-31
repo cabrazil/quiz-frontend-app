@@ -5,16 +5,23 @@ import { QuizResult } from '../components/QuizResult';
 import { QuizContainer } from '../components/QuizContainer';
 import { Timer } from '../components/Timer';
 import { QuizConfig } from '../components/QuizConfig';
-import { Button } from '../components/ui/Button';
+import { Button } from '../components/ui/button';
 import { AnimatePresence, motion } from 'framer-motion';
+import { QuizQuestion } from '../components/QuizQuestion';
+import { Difficulty } from '../types/question';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface QuizConfig {
   totalQuestions: number;
-  difficulty: string;
+  difficulty: Difficulty;
   categoryId?: number;
 }
 
 const Quiz = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { selectedQuestion, isTestMode } = location.state || {};
+
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
@@ -26,20 +33,34 @@ const Quiz = () => {
   const [config, setConfig] = useState<QuizConfig | null>(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState<Set<string>>(new Set());
 
+  useEffect(() => {
+    if (isTestMode && selectedQuestion) {
+      setQuestions([selectedQuestion]);
+      setCurrentQuestionIndex(0);
+      setTimeLeft(10);
+      setIsTimerActive(true);
+      setConfig({
+        totalQuestions: 1,
+        difficulty: selectedQuestion.difficulty as Difficulty,
+        categoryId: selectedQuestion.categoryId
+      });
+    }
+  }, [isTestMode, selectedQuestion]);
+
   const fetchQuestions = async (config: QuizConfig) => {
     setIsLoading(true);
     setError(null);
     try {
       // Converter a dificuldade para o formato do banco de dados
-      const difficultyMap: Record<string, string> = {
-        'easy': 'easy',
-        'medium': 'medium',
-        'hard': 'hard'
+      const difficultyMap: Record<Difficulty, string> = {
+        'Fácil': 'easy',
+        'Médio': 'medium',
+        'Difícil': 'hard'
       };
 
       const queryParams = new URLSearchParams({
         limit: (config.totalQuestions * 2).toString(), // Busca o dobro de questões para ter mais opções
-        difficulty: difficultyMap[config.difficulty] || config.difficulty,
+        difficulty: difficultyMap[config.difficulty],
         ...(config.categoryId && { categoryId: config.categoryId.toString() })
       });
 
@@ -129,17 +150,21 @@ const Quiz = () => {
   };
 
   const handleRestart = () => {
-    setConfig(null);
-    setCurrentQuestionIndex(0);
-    setScore(0);
-    setShowResult(false);
-    setTimeLeft(10);
-    setIsTimerActive(true);
-    setQuestions([]);
-    setUsedQuestionIds(new Set()); // Limpa o cache de questões utilizadas
+    if (isTestMode) {
+      navigate('/');
+    } else {
+      setConfig(null);
+      setCurrentQuestionIndex(0);
+      setScore(0);
+      setShowResult(false);
+      setTimeLeft(10);
+      setIsTimerActive(true);
+      setQuestions([]);
+      setUsedQuestionIds(new Set());
+    }
   };
 
-  if (!config) {
+  if (!config && !isTestMode) {
     return <QuizConfig onStart={handleStart} />;
   }
 
@@ -211,48 +236,26 @@ const Quiz = () => {
 
   return (
     <QuizContainer>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="flex justify-between items-center mb-6"
-      >
-        <div>
-          <div className="inline-block px-4 py-2 bg-primary/10 rounded-lg">
-            <h2 className="text-xl font-semibold text-primary">
-              {currentQuestionIndex + 1}/{questions.length}
-            </h2>
-          </div>
-          <div className={`inline-block px-4 py-2 rounded-lg mt-2 ${
-            config.difficulty === 'easy' 
-              ? 'bg-green-100 text-green-700' 
-              : config.difficulty === 'medium' 
-                ? 'bg-yellow-100 text-yellow-700'
-                : 'bg-red-100 text-red-700'
-          }`}>
-            <p className="text-xl font-medium">
-              {config.difficulty === 'easy' ? 'Fácil' : config.difficulty === 'medium' ? 'Médio' : 'Difícil'}
-            </p>
-          </div>
-        </div>
-        <Timer 
-          timeLeft={timeLeft} 
-          onTimeUp={handleTimeUp}
-          isActive={isTimerActive}
-          onTick={(newTime) => setTimeLeft(newTime)}
-        />
-      </motion.div>
-
       <AnimatePresence mode="wait">
-        {questions[currentQuestionIndex] && (
-          <QuestionCard
-            key={currentQuestionIndex}
+        <motion.div
+          key={currentQuestionIndex}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          <QuizQuestion
             question={questions[currentQuestionIndex]}
             onAnswer={handleAnswer}
-            currentIndex={currentQuestionIndex}
+            timeLeft={timeLeft}
+            totalTime={10}
+            currentQuestion={currentQuestionIndex + 1}
             totalQuestions={questions.length}
-            isTimeUp={!isTimerActive && timeLeft === 0}
+            onTimeUp={handleTimeUp}
+            isTimerActive={isTimerActive}
+            onTick={(newTime) => setTimeLeft(newTime)}
           />
-        )}
+        </motion.div>
       </AnimatePresence>
     </QuizContainer>
   );

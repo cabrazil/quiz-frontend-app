@@ -2,134 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary: #FF6B6B;
+  --primary-dark: #FF5252;
+  --secondary: #4ECDC4;
+  --secondary-dark: #45B7AF;
+  --accent: #FFE66D;
+  --accent-dark: #FFD93D;
+  --background: #2C3E50;
+  --card: #34495E;
+  --text: #ECF0F1;
+  --text-muted: #BDC3C7;
+  --border: #7F8C8D;
+  --success: #2ECC71;
+  --error: #E74C3C;
+  --warning: #F1C40F;
+}
+
 @layer base {
-  :root {
-    --background: 250 100% 98%;
-    --foreground: 250 10% 10%;
-    --card: 0 0% 100%;
-    --card-foreground: 250 10% 10%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 250 10% 10%;
-    --primary: 250 95% 60%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 250 30% 96%;
-    --secondary-foreground: 250 10% 10%;
-    --muted: 250 30% 96%;
-    --muted-foreground: 250 10% 40%;
-    --accent: 250 30% 96%;
-    --accent-foreground: 250 10% 10%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 250 20% 90%;
-    --input: 250 20% 90%;
-    --ring: 250 95% 60%;
-    --radius: 0.75rem;
-  }
-
-  .dark {
-    --background: 250 10% 10%;
-    --foreground: 250 10% 98%;
-    --card: 250 10% 15%;
-    --card-foreground: 250 10% 98%;
-    --popover: 250 10% 15%;
-    --popover-foreground: 250 10% 98%;
-    --primary: 250 95% 60%;
-    --primary-foreground: 250 10% 10%;
-    --secondary: 250 20% 25%;
-    --secondary-foreground: 250 10% 98%;
-    --muted: 250 20% 25%;
-    --muted-foreground: 250 10% 70%;
-    --accent: 250 20% 25%;
-    --accent-foreground: 250 10% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 250 20% 25%;
-    --input: 250 20% 25%;
-    --ring: 250 95% 60%;
-  }
-
-  * {
-    @apply border-border;
-  }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground min-h-screen;
+    background: linear-gradient(135deg, var(--background) 0%, #1a252f 100%);
   }
 }
 
 @layer components {
-  .btn {
-    @apply inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors duration-200;
-  }
-
   .btn-primary {
-    @apply bg-primary text-white hover:bg-primary-dark focus:ring-primary;
+    @apply bg-primary hover:bg-primary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105;
   }
 
   .btn-secondary {
-    @apply bg-secondary text-white hover:bg-secondary-dark focus:ring-secondary;
+    @apply bg-secondary hover:bg-secondary-dark text-white font-bold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105;
   }
 
-  .btn-outline {
-    @apply border-2 border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-gray-500;
-  }
-
-  .btn-success {
-    @apply bg-success text-white hover:bg-success-dark focus:ring-success;
-  }
-
-  .btn-error {
-    @apply bg-error text-white hover:bg-error-dark focus:ring-error;
+  .btn-accent {
+    @apply bg-accent hover:bg-accent-dark text-background font-bold py-2 px-4 rounded-lg transition-all duration-200 transform hover:scale-105;
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-lg p-6;
+    @apply bg-card rounded-xl shadow-lg p-6 transition-all duration-200 hover:shadow-xl;
   }
 
   .input {
-    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring-primary sm:text-sm;
+    @apply bg-card border border-border rounded-lg px-4 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary;
   }
 
-  .label {
-    @apply block text-sm font-medium text-gray-700;
+  .title {
+    @apply text-4xl font-bold text-foreground mb-4;
   }
-}
 
-/* Animações */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+  .subtitle {
+    @apply text-xl text-muted-foreground mb-4;
   }
 }
 
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
+/* Efeitos de hover */
+.hover-glow:hover {
+  box-shadow: 0 0 15px var(--primary);
 }
 
-/* Timer */
-.timer-circle {
-  stroke-dasharray: 553;
-  stroke-dashoffset: 553;
-  transition: stroke-dashoffset 1s linear;
+/* Gradientes */
+.gradient-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
 }
 
-/* Feedback */
-.feedback-success {
-  @apply bg-green-100 text-green-800;
+.gradient-secondary {
+  background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
 }
 
-.feedback-error {
-  @apply bg-red-100 text-red-800;
+/* Scrollbar personalizada */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.feedback-warning {
-  @apply bg-yellow-100 text-yellow-800;
+::-webkit-scrollbar-track {
+  @apply bg-background;
 }
 
-.feedback-info {
-  @apply bg-blue-100 text-blue-800;
+::-webkit-scrollbar-thumb {
+  @apply bg-primary rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary-dark;
 }

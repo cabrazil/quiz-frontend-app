@@ -1,3 +1,5 @@
+import { Difficulty } from './question';
+
 export interface Question {
   id: string;
   text: string;
@@ -5,7 +7,8 @@ export interface Question {
   correctAnswer: string;
   category: string;
   categoryId: number;
-  difficulty: string;
+  difficulty: Difficulty;
+  imageUrl?: string;
 }
 
 export interface QuestionCardProps {

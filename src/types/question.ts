@@ -1,4 +1,9 @@
-export type Difficulty = 'EASY' | 'MEDIUM' | 'HARD';
+export type Difficulty = 'Fácil' | 'Médio' | 'Difícil';
+
+export interface Category {
+  id: number;
+  name: string;
+}
 
 export interface Question {
   id: string;
@@ -7,10 +12,11 @@ export interface Question {
   correctAnswer: string;
   category: string;
   categoryId: number;
-  difficulty: string;
+  difficulty: Difficulty;
   explanation?: string | null;
   createdAt?: Date;
   updatedAt?: Date;
+  imageUrl?: string;
 }
 
 export interface QuizState {
@@ -24,6 +30,6 @@ export interface QuizState {
 
 export interface QuizConfig {
   totalQuestions: number;
-  difficulty: string;
+  difficulty: Difficulty;
   categoryId?: number;
 } 
