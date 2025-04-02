@@ -53,6 +53,46 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      animation: {
+        'gradient-x': 'gradient-x 3s ease infinite',
+        'scale-bounce': 'scale-bounce 1s ease-in-out infinite',
+        'fall-slow': 'fall 3s linear infinite',
+        'fall-medium': 'fall 2.5s linear infinite',
+        'fall-fast': 'fall 2s linear infinite',
+      },
+      keyframes: {
+        'gradient-x': {
+          '0%, 100%': {
+            'background-size': '200% 200%',
+            'background-position': 'left center'
+          },
+          '50%': {
+            'background-size': '200% 200%',
+            'background-position': 'right center'
+          },
+        },
+        'scale-bounce': {
+          '0%, 100%': {
+            transform: 'scale(1)',
+          },
+          '50%': {
+            transform: 'scale(1.1)',
+          },
+        },
+        'fall': {
+          '0%': {
+            transform: 'translateY(-100%)',
+            opacity: 0,
+          },
+          '50%': {
+            opacity: 1,
+          },
+          '100%': {
+            transform: 'translateY(1000%)',
+            opacity: 0,
+          },
+        },
+      },
     },
   },
   plugins: [

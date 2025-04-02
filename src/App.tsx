@@ -3,6 +3,7 @@ import { Home } from './pages/Home';
 import Quiz from './pages/Quiz';
 import { QuizConfig } from './components/QuizConfig';
 import { QuestionSelector } from './pages/QuestionSelector';
+import { TestConfig } from './pages/TestConfig';
 
 function App() {
   return (
@@ -11,7 +12,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/quiz" element={<Quiz />} />
         <Route path="/config" element={<Quiz />} />
-        <Route path="/test" element={<QuestionSelector />} />
+        <Route path="/test" element={<TestConfig />} />
+        <Route path="/select-questions" element={<QuestionSelector />} />
       </Routes>
     </Router>
   );

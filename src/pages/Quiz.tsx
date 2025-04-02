@@ -15,6 +15,7 @@ interface QuizConfig {
   totalQuestions: number;
   difficulty: Difficulty;
   categoryId?: number;
+  useSelectedQuestions: boolean;
 }
 
 const Quiz = () => {
@@ -35,6 +36,7 @@ const Quiz = () => {
 
   useEffect(() => {
     if (isTestMode && selectedQuestion) {
+      console.log('Iniciando modo de teste com questão:', selectedQuestion);
       setQuestions([selectedQuestion]);
       setCurrentQuestionIndex(0);
       setTimeLeft(10);
@@ -42,7 +44,8 @@ const Quiz = () => {
       setConfig({
         totalQuestions: 1,
         difficulty: selectedQuestion.difficulty as Difficulty,
-        categoryId: selectedQuestion.categoryId
+        categoryId: selectedQuestion.categoryId,
+        useSelectedQuestions: false
       });
     }
   }, [isTestMode, selectedQuestion]);
@@ -51,6 +54,33 @@ const Quiz = () => {
     setIsLoading(true);
     setError(null);
     try {
+      if (config.useSelectedQuestions) {
+        // Buscar questões selecionadas
+        const response = await fetch('http://localhost:3000/api/questions/selected');
+        if (!response.ok) {
+          throw new Error('Erro ao carregar questões selecionadas');
+        }
+        const data = await response.json();
+        
+        if (!data || data.length === 0) {
+          throw new Error('Nenhuma questão selecionada encontrada. Por favor, selecione algumas questões primeiro.');
+        }
+
+        // Garante que as questões estejam no formato correto
+        const formattedQuestions = data.map((q: any) => ({
+          id: q.id.toString(),
+          text: q.text,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          category: q.category,
+          categoryId: q.categoryId,
+          difficulty: q.difficulty.toLowerCase()
+        }));
+
+        setQuestions(formattedQuestions);
+        return;
+      }
+
       // Converter a dificuldade para o formato do banco de dados
       const difficultyMap: Record<Difficulty, string> = {
         'Fácil': 'easy',
@@ -151,7 +181,7 @@ const Quiz = () => {
 
   const handleRestart = () => {
     if (isTestMode) {
-      navigate('/');
+      navigate('/test');
     } else {
       setConfig(null);
       setCurrentQuestionIndex(0);
@@ -161,6 +191,7 @@ const Quiz = () => {
       setIsTimerActive(true);
       setQuestions([]);
       setUsedQuestionIds(new Set());
+      navigate('/');
     }
   };
 
@@ -191,10 +222,10 @@ const Quiz = () => {
           <p className="text-xl font-semibold mb-2">Erro</p>
           <p>{error}</p>
           <Button
-            onClick={() => setConfig(null)}
+            onClick={() => navigate('/')}
             className="mt-4"
           >
-            Voltar para Configuração
+            Voltar para Início
           </Button>
         </motion.div>
       </div>
@@ -224,40 +255,32 @@ const Quiz = () => {
             Não foram encontradas questões para os critérios selecionados.
           </p>
           <Button
-            onClick={() => setConfig(null)}
+            onClick={() => navigate('/')}
             className="mt-4"
           >
-            Voltar para Configuração
+            Voltar para Início
           </Button>
         </motion.div>
       </div>
     );
   }
 
+  const currentQuestion = questions[currentQuestionIndex];
+
   return (
-    <QuizContainer>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentQuestionIndex}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -20 }}
-          transition={{ duration: 0.3 }}
-        >
-          <QuizQuestion
-            question={questions[currentQuestionIndex]}
-            onAnswer={handleAnswer}
-            timeLeft={timeLeft}
-            totalTime={10}
-            currentQuestion={currentQuestionIndex + 1}
-            totalQuestions={questions.length}
-            onTimeUp={handleTimeUp}
-            isTimerActive={isTimerActive}
-            onTick={(newTime) => setTimeLeft(newTime)}
-          />
-        </motion.div>
-      </AnimatePresence>
-    </QuizContainer>
+    <div className="container mx-auto p-4">
+      <QuizQuestion
+        question={currentQuestion}
+        onAnswer={handleAnswer}
+        timeLeft={timeLeft}
+        totalTime={10}
+        currentQuestion={currentQuestionIndex + 1}
+        totalQuestions={questions.length}
+        onTimeUp={handleTimeUp}
+        isTimerActive={isTimerActive}
+        onTick={setTimeLeft}
+      />
+    </div>
   );
 };
 

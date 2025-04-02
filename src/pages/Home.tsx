@@ -33,6 +33,13 @@ export const Home = () => {
           </Button>
 
           <Button
+            onClick={() => navigate('/select-questions')}
+            className="w-full py-6 text-xl font-bold gradient-primary hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+          >
+            🎯 Selecionar Questões
+          </Button>
+
+          <Button
             onClick={() => navigate('/test')}
             variant="outline"
             className="w-full py-6 text-xl font-bold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
@@ -44,6 +51,7 @@ export const Home = () => {
             <h2 className="text-lg font-semibold mb-3">ℹ️ Sobre os modos:</h2>
             <div className="space-y-2 text-muted-foreground">
               <p><strong>Quiz Normal:</strong> Jogue com várias questões aleatórias baseadas nas suas configurações.</p>
+              <p><strong>Selecionar Questões:</strong> Escolha quais questões serão exibidas no quiz.</p>
               <p><strong>Modo de Teste:</strong> Selecione uma questão específica para testar.</p>
             </div>
           </div>

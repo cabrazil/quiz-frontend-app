@@ -17,6 +17,7 @@ export interface Question {
   createdAt?: Date;
   updatedAt?: Date;
   imageUrl?: string;
+  scrImage?: string;
 }
 
 export interface QuizState {
