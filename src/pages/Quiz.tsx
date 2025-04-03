@@ -61,12 +61,12 @@ const Quiz = () => {
         }
         const data = await response.json();
         
-        if (!data || data.length === 0) {
+        if (!data || !data.questions || data.questions.length === 0) {
           throw new Error('Nenhuma questão selecionada encontrada. Por favor, selecione algumas questões primeiro.');
         }
 
         // Garante que as questões estejam no formato correto
-        const formattedQuestions = data.map((q: any) => ({
+        const formattedQuestions = data.questions.map((q: any) => ({
           id: q.id.toString(),
           text: q.text,
           options: q.options,
@@ -78,17 +78,31 @@ const Quiz = () => {
           updatedAt: q.updatedAt
         }));
 
-        setQuestions(formattedQuestions);
+        // Limita o número de questões ao solicitado
+        const limitedQuestions = formattedQuestions.slice(0, config.totalQuestions);
+        setQuestions(limitedQuestions);
         return;
       }
 
-      const queryParams = new URLSearchParams({
-        limit: (config.totalQuestions * 2).toString(), // Busca o dobro de questões para ter mais opções
-        difficulty: config.difficulty,
-        ...(config.categoryId && { categoryId: config.categoryId.toString() })
-      });
-
-      const url = `/api/questions?${queryParams}`;
+      // Constrói a URL manualmente para evitar codificação de caracteres especiais
+      const baseUrl = '/api/questions';
+      const queryParams = [];
+      
+      // Adiciona o parâmetro limit
+      queryParams.push(`limit=${config.totalQuestions * 2}`);
+      
+      // Adiciona os parâmetros apenas se existirem
+      if (config.difficulty) {
+        queryParams.push(`difficulty=${config.difficulty}`);
+      }
+      if (config.categoryId) {
+        queryParams.push(`categoryId=${config.categoryId}`);
+      }
+      
+      // Junta os parâmetros com &
+      const queryString = queryParams.join('&');
+      const url = `${baseUrl}?${queryString}`;
+      
       console.log('URL da requisição:', url);
       const response = await fetch(url);
       
@@ -99,33 +113,29 @@ const Quiz = () => {
       const data = await response.json();
       console.log('Dados recebidos:', data);
 
-      if (!data || data.length === 0) {
+      if (!data || !data.questions || data.questions.length === 0) {
         throw new Error('Nenhuma questão encontrada para os critérios selecionados');
       }
 
-      // Filtra as questões que ainda não foram utilizadas
-      const availableQuestions = data.filter((q: Question) => !usedQuestionIds.has(q.id.toString()));
-      
-      // Se não houver questões suficientes, limpa o cache de questões utilizadas
-      if (availableQuestions.length < config.totalQuestions) {
-        setUsedQuestionIds(new Set());
-        const newAvailableQuestions = data.filter((q: Question) => !usedQuestionIds.has(q.id.toString()));
-        if (newAvailableQuestions.length < config.totalQuestions) {
-          throw new Error('Não há questões suficientes disponíveis. Por favor, tente novamente.');
-        }
-        setQuestions(newAvailableQuestions.slice(0, config.totalQuestions));
-      } else {
-        setQuestions(availableQuestions.slice(0, config.totalQuestions));
-      }
+      // Garante que as questões estejam no formato correto
+      const formattedQuestions = data.questions.map((q: any) => ({
+        id: q.id.toString(),
+        text: q.text,
+        options: q.options,
+        correctAnswer: q.correctAnswer,
+        category: q.category,
+        categoryId: q.categoryId,
+        difficulty: q.difficulty,
+        createdAt: q.createdAt,
+        updatedAt: q.updatedAt
+      }));
 
-      // Adiciona as IDs das questões selecionadas ao conjunto de questões utilizadas
-      const newUsedQuestionIds = new Set(usedQuestionIds);
-      questions.forEach(q => newUsedQuestionIds.add(q.id.toString()));
-      setUsedQuestionIds(newUsedQuestionIds);
-
-    } catch (err) {
-      console.error('Erro ao carregar questões:', err);
-      setError(err instanceof Error ? err.message : 'Erro ao carregar as questões');
+      // Limita o número de questões ao solicitado
+      const limitedQuestions = formattedQuestions.slice(0, config.totalQuestions);
+      setQuestions(limitedQuestions);
+    } catch (error) {
+      console.error('Erro ao carregar questões:', error);
+      setError(error instanceof Error ? error.message : 'Erro ao carregar questões');
     } finally {
       setIsLoading(false);
     }

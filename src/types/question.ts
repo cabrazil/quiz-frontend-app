@@ -1,4 +1,4 @@
-export type Difficulty = 'FÁCIL' | 'MÉDIO' | 'DIFÍCIL' | 'all';
+export type Difficulty = 'Fácil' | 'Médio' | 'Difícil';
 
 export interface Category {
   id: number;
@@ -6,13 +6,13 @@ export interface Category {
 }
 
 export interface Question {
-  id: number;
+  id: string;
   text: string;
-  categoryId: number;
-  category?: string;
-  difficulty: Difficulty;
-  correctAnswer: string;
   options: string[];
+  correctAnswer: string;
+  category: string;
+  categoryId: number;
+  difficulty: Difficulty;
   explanation?: string;
   source?: string;
   scrImage?: string;

@@ -22,7 +22,7 @@ export const TestConfig = () => {
 
     try {
       console.log('Buscando questão:', questionId);
-      const response = await fetch(`${API_URL}/questions/${questionId}`);
+      const response = await fetch(`${API_URL}/api/questions/${questionId}`);
       if (!response.ok) {
         throw new Error('Questão não encontrada');
       }

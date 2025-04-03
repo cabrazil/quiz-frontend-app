@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Button } from './ui/button';
 import { Category, Difficulty } from '../types/question';
 import { useNavigate } from 'react-router-dom';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { CategorySelect } from './CategorySelect';
 
 const API_URL = 'http://localhost:3000';
 
@@ -14,173 +16,130 @@ interface QuizConfigProps {
   }) => void;
 }
 
-const difficulties = [
-  { value: 'FÁCIL' as Difficulty, label: 'Fácil', icon: '🌟' },
-  { value: 'MÉDIO' as Difficulty, label: 'Médio', icon: '⭐' },
-  { value: 'DIFÍCIL' as Difficulty, label: 'Difícil', icon: '💫' }
-];
-
 export const QuizConfig = ({ onStart }: QuizConfigProps) => {
-  const questionCounts = [5, 10, 15, 20, 25, 30];
-
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('MÉDIO');
-  const [selectedCount, setSelectedCount] = useState(10);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [useSelectedQuestions, setUseSelectedQuestions] = useState(false);
-
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('Fácil');
+  const [totalQuestions, setTotalQuestions] = useState<number>(10);
+  const [useSelectedQuestions, setUseSelectedQuestions] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/categories`);
-        if (!response.ok) {
-          throw new Error('Erro ao carregar categorias');
-        }
-        const data = await response.json();
-        setCategories(data);
-      } catch (error) {
-        console.error('Erro ao carregar categorias:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchCategories();
   }, []);
 
-  const handleStart = () => {
-    onStart({
-      totalQuestions: selectedCount,
-      difficulty: selectedDifficulty,
-      categoryId: selectedCategory || undefined,
-      useSelectedQuestions
-    });
+  const fetchCategories = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/categories`);
+      if (!response.ok) {
+        throw new Error('Erro ao carregar categorias');
+      }
+      const data = await response.json();
+      setCategories(data);
+    } catch (error) {
+      setError('Erro ao carregar categorias');
+      console.error(error);
+    }
   };
 
-  if (isLoading) {
-    return (
-      <div className="max-w-md mx-auto p-8 bg-card rounded-xl shadow-lg">
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
-        </div>
-      </div>
-    );
-  }
+  const handleStart = () => {
+    if (useSelectedQuestions) {
+      onStart({
+        totalQuestions,
+        difficulty: selectedDifficulty,
+        useSelectedQuestions: true
+      });
+    } else {
+      onStart({
+        totalQuestions,
+        difficulty: selectedDifficulty,
+        categoryId: selectedCategory === 'all' ? undefined : parseInt(selectedCategory),
+        useSelectedQuestions: false
+      });
+    }
+  };
 
   return (
-    <div className="max-w-md mx-auto p-8 bg-card rounded-xl shadow-lg">
-      <div className="space-y-8">
-        <div className="text-center">
-          <div className="bg-primary/10 p-3 rounded-lg flex items-center justify-center gap-4 mb-6">
-            <div className="relative w-12 h-12">
-              <div className="absolute inset-0 bg-primary rounded-full flex items-center justify-center">
-                <div className="w-6 h-6 bg-white rounded-full"></div>
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full"></div>
-            </div>
-            <h1 className="text-4xl font-bold text-primary">Cuca Boa</h1>
+    <div className="container mx-auto p-4">
+      <div className="max-w-md mx-auto space-y-6">
+        <h1 className="text-2xl font-bold text-center">Configuração do Quiz</h1>
+        
+        {error && (
+          <div className="p-3 bg-destructive/10 border border-destructive/20 rounded-md text-destructive">
+            {error}
           </div>
-          <p className="text-muted-foreground text-lg">Configure seu quiz antes de começar</p>
-        </div>
+        )}
 
-        <div className="space-y-6">
-          <div className="flex items-center space-x-3">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1">Número de Questões</label>
+            <input
+              type="number"
+              min="1"
+              max="50"
+              value={totalQuestions}
+              onChange={(e) => setTotalQuestions(parseInt(e.target.value))}
+              className="w-full p-2 border rounded-md text-black"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Dificuldade</label>
+            <Select
+              value={selectedDifficulty}
+              onValueChange={(value) => setSelectedDifficulty(value as Difficulty)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Selecione a dificuldade" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Fácil">Fácil</SelectItem>
+                <SelectItem value="Médio">Médio</SelectItem>
+                <SelectItem value="Difícil">Difícil</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Categoria</label>
+            <CategorySelect
+              categories={categories}
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+              disabled={useSelectedQuestions}
+            />
+          </div>
+
+          <div className="flex items-center space-x-2">
             <input
               type="checkbox"
               id="useSelectedQuestions"
               checked={useSelectedQuestions}
               onChange={(e) => setUseSelectedQuestions(e.target.checked)}
-              className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+              className="h-4 w-4"
             />
-            <label htmlFor="useSelectedQuestions" className="text-lg font-medium text-foreground">
+            <label htmlFor="useSelectedQuestions" className="text-sm">
               Usar questões selecionadas
             </label>
           </div>
-
-          {!useSelectedQuestions && (
-            <>
-              <div>
-                <label className="block text-lg font-medium text-foreground mb-4">
-                  🎯 Categoria
-                </label>
-                <div className="grid grid-cols-2 gap-3 max-h-48 overflow-y-auto p-2">
-                  <Button
-                    variant={selectedCategory === null ? 'primary' : 'outline'}
-                    onClick={() => setSelectedCategory(null)}
-                    className="w-full hover-glow"
-                  >
-                    🎲 Todas
-                  </Button>
-                  {categories.map((category) => (
-                    <Button
-                      key={category.id}
-                      variant={selectedCategory === category.id ? 'primary' : 'outline'}
-                      onClick={() => setSelectedCategory(category.id)}
-                      className="w-full hover-glow"
-                    >
-                      {category.name}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-lg font-medium text-foreground mb-4">
-                  ⭐ Dificuldade
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {difficulties.map((diff) => (
-                    <Button
-                      key={diff.value}
-                      variant={selectedDifficulty === diff.value ? 'primary' : 'outline'}
-                      onClick={() => setSelectedDifficulty(diff.value)}
-                      className="w-full hover-glow"
-                    >
-                      <span className="mr-2">{diff.icon}</span>
-                      {diff.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-lg font-medium text-foreground mb-4">
-                  📝 Quantidade de Questões
-                </label>
-                <div className="grid grid-cols-3 gap-3">
-                  {questionCounts.map((count) => (
-                    <Button
-                      key={count}
-                      variant={selectedCount === count ? 'primary' : 'outline'}
-                      onClick={() => setSelectedCount(count)}
-                      className="w-full hover-glow"
-                    >
-                      {count}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-            </>
-          )}
         </div>
 
-        <Button
-          onClick={handleStart}
-          className="w-full py-6 text-xl font-bold gradient-primary hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-        >
-          🚀 Começar Quiz
-        </Button>
-
-        <Button
-          onClick={() => navigate('/test')}
-          variant="outline"
-          className="w-full py-6 text-xl font-bold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-        >
-          🎯 Modo de Teste
-        </Button>
+        <div className="flex justify-end space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => navigate('/')}
+          >
+            Voltar
+          </Button>
+          <Button
+            onClick={handleStart}
+            disabled={loading}
+          >
+            {loading ? 'Iniciando...' : 'Começar Quiz'}
+          </Button>
+        </div>
       </div>
     </div>
   );
