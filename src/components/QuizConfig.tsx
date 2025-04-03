@@ -15,15 +15,15 @@ interface QuizConfigProps {
 }
 
 const difficulties = [
-  { value: 'Fácil' as Difficulty, label: 'Fácil', icon: '🌟' },
-  { value: 'Médio' as Difficulty, label: 'Médio', icon: '⭐' },
-  { value: 'Difícil' as Difficulty, label: 'Difícil', icon: '💫' }
+  { value: 'FÁCIL' as Difficulty, label: 'Fácil', icon: '🌟' },
+  { value: 'MÉDIO' as Difficulty, label: 'Médio', icon: '⭐' },
+  { value: 'DIFÍCIL' as Difficulty, label: 'Difícil', icon: '💫' }
 ];
 
 export const QuizConfig = ({ onStart }: QuizConfigProps) => {
   const questionCounts = [5, 10, 15, 20, 25, 30];
 
-  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('Médio');
+  const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('MÉDIO');
   const [selectedCount, setSelectedCount] = useState(10);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);

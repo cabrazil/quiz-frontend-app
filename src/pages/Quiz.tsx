@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Question } from '../types/quiz';
+import { Question, Difficulty } from '../types/question';
 import { QuestionCard } from '../components/ui/QuestionCard';
 import { QuizResult } from '../components/QuizResult';
 import { QuizContainer } from '../components/QuizContainer';
@@ -8,7 +8,6 @@ import { QuizConfig } from '../components/QuizConfig';
 import { Button } from '../components/ui/button';
 import { AnimatePresence, motion } from 'framer-motion';
 import { QuizQuestion } from '../components/QuizQuestion';
-import { Difficulty } from '../types/question';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface QuizConfig {
@@ -74,23 +73,18 @@ const Quiz = () => {
           correctAnswer: q.correctAnswer,
           category: q.category,
           categoryId: q.categoryId,
-          difficulty: q.difficulty.toLowerCase()
+          difficulty: q.difficulty,
+          createdAt: q.createdAt,
+          updatedAt: q.updatedAt
         }));
 
         setQuestions(formattedQuestions);
         return;
       }
 
-      // Converter a dificuldade para o formato do banco de dados
-      const difficultyMap: Record<Difficulty, string> = {
-        'Fácil': 'easy',
-        'Médio': 'medium',
-        'Difícil': 'hard'
-      };
-
       const queryParams = new URLSearchParams({
         limit: (config.totalQuestions * 2).toString(), // Busca o dobro de questões para ter mais opções
-        difficulty: difficultyMap[config.difficulty],
+        difficulty: config.difficulty,
         ...(config.categoryId && { categoryId: config.categoryId.toString() })
       });
 
@@ -110,12 +104,12 @@ const Quiz = () => {
       }
 
       // Filtra as questões que ainda não foram utilizadas
-      const availableQuestions = data.filter((q: Question) => !usedQuestionIds.has(q.id));
+      const availableQuestions = data.filter((q: Question) => !usedQuestionIds.has(q.id.toString()));
       
       // Se não houver questões suficientes, limpa o cache de questões utilizadas
       if (availableQuestions.length < config.totalQuestions) {
         setUsedQuestionIds(new Set());
-        const newAvailableQuestions = data.filter((q: Question) => !usedQuestionIds.has(q.id));
+        const newAvailableQuestions = data.filter((q: Question) => !usedQuestionIds.has(q.id.toString()));
         if (newAvailableQuestions.length < config.totalQuestions) {
           throw new Error('Não há questões suficientes disponíveis. Por favor, tente novamente.');
         }
@@ -126,7 +120,7 @@ const Quiz = () => {
 
       // Adiciona as IDs das questões selecionadas ao conjunto de questões utilizadas
       const newUsedQuestionIds = new Set(usedQuestionIds);
-      questions.forEach(q => newUsedQuestionIds.add(q.id));
+      questions.forEach(q => newUsedQuestionIds.add(q.id.toString()));
       setUsedQuestionIds(newUsedQuestionIds);
 
     } catch (err) {
