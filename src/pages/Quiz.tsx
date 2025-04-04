@@ -55,11 +55,19 @@ const Quiz = () => {
     try {
       if (config.useSelectedQuestions) {
         // Buscar questões selecionadas
-        const response = await fetch('http://localhost:3000/api/questions/selected');
+        const response = await fetch('http://localhost:3000/api/quiz/start', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          }
+        });
+        
         if (!response.ok) {
-          throw new Error('Erro ao carregar questões selecionadas');
+          throw new Error('Erro ao iniciar o quiz com questões selecionadas');
         }
+        
         const data = await response.json();
+        console.log('Dados da sessão do quiz:', data);
         
         if (!data || !data.questions || data.questions.length === 0) {
           throw new Error('Nenhuma questão selecionada encontrada. Por favor, selecione algumas questões primeiro.');
@@ -78,9 +86,7 @@ const Quiz = () => {
           updatedAt: q.updatedAt
         }));
 
-        // Limita o número de questões ao solicitado
-        const limitedQuestions = formattedQuestions.slice(0, config.totalQuestions);
-        setQuestions(limitedQuestions);
+        setQuestions(formattedQuestions);
         return;
       }
 

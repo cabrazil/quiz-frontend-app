@@ -132,7 +132,7 @@ export const QuizQuestion = ({
                 </h2>
               </div>
               <div className="flex-1 relative">
-                <div className="h-3 md:h-4 bg-background rounded-full overflow-hidden">
+                <div className="h-4 md:h-5 bg-background rounded-full overflow-hidden">
                   <div
                     className={`absolute top-0 left-0 h-full transition-all duration-1000 ${getTimerColor()}`}
                     style={{ width: `${progress}%` }}
@@ -153,9 +153,10 @@ export const QuizQuestion = ({
             </div>
 
             {/* Categoria e Dificuldade */}
-            <div className="flex items-center gap-3 text-base font-medium">
-              <span className="text-primary">🎯 {question.category}</span>
-              <span className="text-secondary">⭐ {question.difficulty}</span>
+            <div className="flex items-center gap-3">
+              <div className="bg-primary/10 px-4 py-2 rounded-lg">
+                <span className="text-xl font-bold text-primary">🎯 {question.category}</span>
+              </div>
             </div>
 
             {/* Questão */}
@@ -171,12 +172,11 @@ export const QuizQuestion = ({
                 const showResult = isAnswered && (isCorrect || isSelected);
                 const showCorrectAnswer = timeLeft === 0 && isCorrect;
                 const optionLetter = String.fromCharCode(65 + index); // A, B, C, D
-
                 return (
                   <div
                     key={index}
                     className={`
-                      relative w-full py-1.5 px-3 rounded-full cursor-pointer transition-all duration-300 bg-white shadow-md
+                      relative w-full py-2 px-3 rounded-full cursor-pointer transition-all duration-300 bg-white shadow-md
                       ${showResult 
                         ? (isCorrect 
                             ? 'bg-gradient-to-r from-green-500 to-green-600 text-white border-4 border-success shadow-[0_0_15px_rgba(34,197,94,0.3)]' 
@@ -207,7 +207,7 @@ export const QuizQuestion = ({
                       `}>
                         {optionLetter}
                       </div>
-                      <span className="flex-1 text-left line-clamp-2 text-sm md:text-base font-medium text-gray-800">
+                      <span className="flex-1 text-left line-clamp-2 text-base md:text-lg font-medium text-gray-800">
                         {option}
                       </span>
                     </div>
@@ -240,7 +240,7 @@ export const QuizQuestion = ({
                 </div>
                 <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full"></div>
               </div>
-              <h3 className="text-3xl font-bold text-primary">Cuca Boa</h3>
+              <h3 className="text-3xl font-bold text-primary">Cuca Legal</h3>
             </div>
             <div className="flex-1 flex items-center justify-center p-2">
               {question.scrImage ? (

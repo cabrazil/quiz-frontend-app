@@ -17,7 +17,7 @@ export const Home = () => {
               </div>
               <div className="absolute -top-1 -right-1 w-4 h-4 bg-accent rounded-full"></div>
             </div>
-            <h1 className="text-4xl font-bold text-primary">Cuca Boa</h1>
+            <h1 className="text-4xl font-bold text-primary">Cuca Legal</h1>
           </div>
           <p className="text-muted-foreground text-lg">
             Escolha o modo que deseja jogar
