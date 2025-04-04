@@ -33,4 +33,16 @@ export interface QuizConfig {
   totalQuestions: number;
   difficulty: Difficulty;
   categoryId?: number;
+}
+
+export interface QuestionFormData {
+  text: string;
+  options: string[];
+  correctAnswer: string;
+  category: string;
+  categoryId: number;
+  difficulty: Difficulty;
+  explanation?: string;
+  source?: string;
+  scrImage?: string;
 } 

@@ -47,12 +47,21 @@ export const Home = () => {
             🎯 Modo de Teste
           </Button>
 
+          <Button
+            onClick={() => navigate('/question-management')}
+            variant="outline"
+            className="w-full py-6 text-xl font-bold hover:shadow-lg transform hover:scale-105 transition-all duration-200"
+          >
+            ⚙️ Gerenciar Questões
+          </Button>
+
           <div className="mt-8 p-4 bg-muted/50 rounded-lg">
             <h2 className="text-lg font-semibold mb-3">ℹ️ Sobre os modos:</h2>
             <div className="space-y-2 text-muted-foreground">
               <p><strong>Quiz Normal:</strong> Jogue com várias questões aleatórias baseadas nas suas configurações.</p>
               <p><strong>Selecionar Questões:</strong> Escolha quais questões serão exibidas no quiz.</p>
               <p><strong>Modo de Teste:</strong> Selecione uma questão específica para testar.</p>
+              <p><strong>Gerenciar Questões:</strong> Adicione, edite ou remova questões do banco de dados.</p>
             </div>
           </div>
         </div>
