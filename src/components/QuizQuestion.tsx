@@ -48,11 +48,23 @@ export const QuizQuestion = ({
       soundManager.playSuccess().catch(error => {
         console.error('Erro ao tocar som de sucesso:', error);
       });
-      if (currentQuestion < totalQuestions) {
-        setShowTransition(true);
-      }
+      
+      // Não mostramos a transição imediatamente, apenas quando o componente Quiz.tsx chamar onAnswer
+      // Isso garante que a resposta correta seja exibida por 3 segundos
     }
   }, [isAnswered, selectedAnswer, question.correctAnswer, timeLeft, currentQuestion, totalQuestions]);
+
+  // Adicionamos um novo useEffect para controlar a transição
+  useEffect(() => {
+    // Quando o timer acaba ou o usuário responde, mostramos a transição após 3 segundos
+    if ((isAnswered || timeLeft === 0) && currentQuestion < totalQuestions) {
+      const timer = setTimeout(() => {
+        setShowTransition(true);
+      }, 3000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isAnswered, timeLeft, currentQuestion, totalQuestions]);
 
   useEffect(() => {
     let interval: number;
@@ -70,6 +82,7 @@ export const QuizQuestion = ({
         }
         
         if (newTime <= 0) {
+          // Quando o timer chega a zero, chamamos onTimeUp
           onTimeUp();
         }
       }, 1000);

@@ -154,40 +154,39 @@ const Quiz = () => {
   };
 
   const handleAnswer = (selectedAnswer: string) => {
+    // Desativa o timer imediatamente
     setIsTimerActive(false);
+    
     const currentQuestion = questions[currentQuestionIndex];
     
     if (selectedAnswer && selectedAnswer === currentQuestion.correctAnswer) {
       setScore(score + 1);
     }
 
-    if (currentQuestionIndex < questions.length - 1) {
-      setTimeout(() => {
+    // Aguarda 3 segundos antes de avançar para a próxima questão
+    setTimeout(() => {
+      if (currentQuestionIndex < questions.length - 1) {
         setCurrentQuestionIndex(currentQuestionIndex + 1);
         setTimeLeft(10);
         setIsTimerActive(true);
-      }, 3000);
-    } else {
-      setTimeout(() => {
+      } else {
         setShowResult(true);
-      }, 3000);
-    }
+      }
+    }, 3000);
   };
 
   const handleTimeUp = () => {
+    // Desativa o timer imediatamente
     setIsTimerActive(false);
-    handleAnswer('');
-    if (currentQuestionIndex < questions.length - 1) {
-      setTimeout(() => {
-        setCurrentQuestionIndex(currentQuestionIndex + 1);
-        setTimeLeft(10);
-        setIsTimerActive(true);
-      }, 3000);
-    } else {
-      setTimeout(() => {
-        setShowResult(true);
-      }, 3000);
-    }
+    
+    // Não processa a resposta imediatamente, apenas marca que o tempo acabou
+    // O componente QuizQuestion vai mostrar a resposta correta
+    
+    // Aguarda 3 segundos antes de avançar para a próxima questão
+    setTimeout(() => {
+      // Processa a resposta vazia (tempo esgotado)
+      handleAnswer('');
+    }, 3000);
   };
 
   const handleRestart = () => {
