@@ -32,6 +32,7 @@ const Quiz = () => {
   const [error, setError] = useState<string | null>(null);
   const [config, setConfig] = useState<QuizConfig | null>(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState<Set<string>>(new Set());
+  const [quizName] = useState("Cuca Legal");
 
   useEffect(() => {
     if (isTestMode && selectedQuestion) {
@@ -289,6 +290,7 @@ const Quiz = () => {
         onTimeUp={handleTimeUp}
         isTimerActive={isTimerActive}
         onTick={setTimeLeft}
+        quizName={quizName}
       />
     </div>
   );

@@ -15,6 +15,7 @@ interface QuizQuestionProps {
   onTimeUp: () => void;
   isTimerActive: boolean;
   onTick: (newTime: number) => void;
+  quizName: string;
 }
 
 export const QuizQuestion = ({ 
@@ -26,7 +27,8 @@ export const QuizQuestion = ({
   totalQuestions,
   onTimeUp,
   isTimerActive,
-  onTick
+  onTick,
+  quizName
 }: QuizQuestionProps) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isAnswered, setIsAnswered] = useState(false);
@@ -47,9 +49,7 @@ export const QuizQuestion = ({
         console.error('Erro ao tocar som de sucesso:', error);
       });
       if (currentQuestion < totalQuestions) {
-        setTimeout(() => {
-          setShowTransition(true);
-        }, 2000);
+        setShowTransition(true);
       }
     }
   }, [isAnswered, selectedAnswer, question.correctAnswer, timeLeft, currentQuestion, totalQuestions]);
@@ -244,7 +244,7 @@ export const QuizQuestion = ({
             </div>
             <div className="flex-1 flex items-center justify-center p-2">
               {question.scrImage ? (
-                <div className="relative w-full aspect-square flex items-center justify-center overflow-hidden rounded-lg bg-card border border-primary/20 shadow-sm">
+                <div className="relative w-full aspect-square flex items-center justify-center overflow-hidden rounded-lg bg-card border-4 border-primary/30 shadow-md">
                   <img 
                     src={question.scrImage.startsWith('/') ? question.scrImage : getQuestionImagePath(Number(question.id))} 
                     alt="Imagem da questão" 
@@ -261,7 +261,7 @@ export const QuizQuestion = ({
                   />
                 </div>
               ) : (
-                <div className="text-muted-foreground text-center p-6 border border-primary/20 rounded-lg">
+                <div className="text-muted-foreground text-center p-6 border-4 border-primary/30 rounded-lg">
                   <p className="text-base">Imagem não disponível</p>
                   <p className="text-sm mt-1">Esta questão não possui uma imagem associada</p>
                 </div>
@@ -277,6 +277,7 @@ export const QuizQuestion = ({
             currentQuestion={currentQuestion}
             totalQuestions={totalQuestions}
             onTransitionEnd={handleTransitionEnd}
+            quizName={quizName}
           />
         </div>
       )}

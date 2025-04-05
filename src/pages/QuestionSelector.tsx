@@ -110,13 +110,35 @@ export const QuestionSelector = () => {
     try {
       console.log('Enviando questões selecionadas:', Array.from(selectedQuestions));
       
+      // Cria as pastas para cada questão selecionada
+      const questionIds = Array.from(selectedQuestions);
+      
+      // Chama o endpoint para criar as pastas
+      const foldersResponse = await fetch(`${API_URL}/api/questions/create-folders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          questionIds
+        }),
+      });
+      
+      if (!foldersResponse.ok) {
+        console.error('Erro ao criar pastas para as questões:', await foldersResponse.text());
+        // Continua mesmo com erro na criação das pastas
+      } else {
+        const foldersData = await foldersResponse.json();
+        console.log('Pastas criadas com sucesso:', foldersData);
+      }
+      
       const response = await fetch(`${API_URL}/api/questions/selected`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          questionIds: Array.from(selectedQuestions)
+          questionIds
         }),
       });
 
