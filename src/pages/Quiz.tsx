@@ -33,6 +33,7 @@ const Quiz = () => {
   const [config, setConfig] = useState<QuizConfig | null>(null);
   const [usedQuestionIds, setUsedQuestionIds] = useState<Set<string>>(new Set());
   const [quizName] = useState("Cuca Legal");
+  const [sessionId, setSessionId] = useState<number | null>(null);
 
   useEffect(() => {
     if (isTestMode && selectedQuestion) {
@@ -73,6 +74,9 @@ const Quiz = () => {
         if (!data || !data.questions || data.questions.length === 0) {
           throw new Error('Nenhuma questão selecionada encontrada. Por favor, selecione algumas questões primeiro.');
         }
+
+        // Salva o ID da sessão do quiz
+        setSessionId(data.sessionId);
 
         // Garante que as questões estejam no formato correto
         const formattedQuestions = data.questions.map((q: any) => ({
@@ -172,6 +176,8 @@ const Quiz = () => {
         setTimeLeft(10);
         setIsTimerActive(true);
       } else {
+        // Finaliza o quiz e notifica o backend
+        finishQuiz();
         setShowResult(true);
       }
     }, 3000);
@@ -191,6 +197,37 @@ const Quiz = () => {
     }, 3000);
   };
 
+  // Função para finalizar o quiz e notificar o backend
+  const finishQuiz = async () => {
+    // Se não estiver usando questões selecionadas ou não tiver um ID de sessão, não precisa notificar o backend
+    if (!config?.useSelectedQuestions || !sessionId) {
+      return;
+    }
+
+    try {
+      console.log('Finalizando quiz com sessão:', sessionId, 'e pontuação:', score);
+      
+      const response = await fetch(`http://localhost:3000/api/quiz/${sessionId}/finish`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          score
+        }),
+      });
+      
+      if (!response.ok) {
+        console.error('Erro ao finalizar quiz:', await response.text());
+      } else {
+        const data = await response.json();
+        console.log('Quiz finalizado com sucesso:', data);
+      }
+    } catch (error) {
+      console.error('Erro ao finalizar quiz:', error);
+    }
+  };
+
   const handleRestart = () => {
     if (isTestMode) {
       navigate('/test');
@@ -203,6 +240,7 @@ const Quiz = () => {
       setIsTimerActive(true);
       setQuestions([]);
       setUsedQuestionIds(new Set());
+      setSessionId(null);
       navigate('/');
     }
   };

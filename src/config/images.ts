@@ -8,7 +8,7 @@ const API_URL = 'http://localhost:3000';
 export const imageConfig = {
   defaultImage: '/questions/default/image_1.jpg',
   basePath: '/questions',
-  imageFormat: 'jpg',
+  imageFormats: ['jpg', 'png'],
   imagePrefix: 'image_',
   apiUrl: API_URL,
   getFullImageUrl: (path: string) => {
@@ -18,8 +18,8 @@ export const imageConfig = {
 };
 
 // Função para gerar o caminho da imagem de uma questão
-export const getQuestionImagePath = (questionId: number): string => {
-  return `${imageConfig.basePath}/${questionId}/${imageConfig.imagePrefix}1.${imageConfig.imageFormat}`;
+export const getQuestionImagePath = (questionId: number, format: string = 'jpg'): string => {
+  return `${imageConfig.basePath}/${questionId}/${imageConfig.imagePrefix}1.${format}`;
 };
 
 // Função para validar se uma imagem existe
