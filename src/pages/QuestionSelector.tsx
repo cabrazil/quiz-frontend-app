@@ -131,8 +131,30 @@ export const QuestionSelector = () => {
         const foldersData = await foldersResponse.json();
         console.log('Pastas criadas com sucesso:', foldersData);
         
-        // Atualiza o campo scrImage para cada questão selecionada
-        await updateQuestionImages(questionIds);
+        // Processa as imagens para todas as questões selecionadas
+        try {
+          console.log('Iniciando processamento de imagens para todas as questões selecionadas');
+          const imagesResponse = await fetch(`${API_URL}/api/questions/process-images`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              questionIds
+            }),
+          });
+          
+          if (!imagesResponse.ok) {
+            console.error('Erro ao processar imagens:', await imagesResponse.text());
+            // Continua mesmo com erro no processamento de imagens
+          } else {
+            const imagesData = await imagesResponse.json();
+            console.log('Processamento de imagens iniciado com sucesso:', imagesData);
+          }
+        } catch (error) {
+          console.error('Erro ao processar imagens:', error);
+          // Continua mesmo com erro no processamento de imagens
+        }
       }
       
       const response = await fetch(`${API_URL}/api/questions/selected`, {
@@ -172,36 +194,6 @@ export const QuestionSelector = () => {
       setError(error instanceof Error ? error.message : 'Erro ao salvar questões selecionadas');
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Função para atualizar o campo scrImage de cada questão selecionada
-  const updateQuestionImages = async (questionIds: number[]) => {
-    console.log('Atualizando imagens das questões:', questionIds);
-    
-    for (const questionId of questionIds) {
-      try {
-        const imagePath = `/src/assets/questions/${questionId}/image.jpg`;
-        console.log(`Atualizando imagem da questão ${questionId} para: ${imagePath}`);
-        
-        const response = await fetch(`${API_URL}/api/questions/${questionId}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            scrImage: imagePath
-          }),
-        });
-        
-        if (!response.ok) {
-          console.error(`Erro ao atualizar imagem da questão ${questionId}:`, await response.text());
-        } else {
-          console.log(`Imagem da questão ${questionId} atualizada com sucesso`);
-        }
-      } catch (error) {
-        console.error(`Erro ao atualizar imagem da questão ${questionId}:`, error);
-      }
     }
   };
 

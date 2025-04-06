@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { Loader2, X, Check } from 'lucide-react';
 import axios from 'axios';
+import { imageConfig } from '../config/images';
 
 interface ImageOption {
   id: string;
@@ -39,14 +40,22 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({
         
         // Busca as opções de imagem para a questão
         const response = await axios.get(`http://localhost:3000/api/questions/${questionId}/images`);
-        setImageOptions(response.data.images || []);
         
         if (response.data.images && response.data.images.length > 0) {
+          setImageOptions(response.data.images);
           setSelectedImage(response.data.images[0]);
+        } else {
+          setError('Nenhuma opção de imagem encontrada para esta questão. O processamento de imagens pode estar em andamento.');
         }
       } catch (err) {
         console.error('Error fetching image options:', err);
-        setError('Não foi possível carregar as opções de imagem. Por favor, tente novamente.');
+        
+        // Verifica se o erro é 404 (opções não encontradas)
+        if (axios.isAxiosError(err) && err.response?.status === 404) {
+          setError('Nenhuma opção de imagem encontrada para esta questão. O processamento de imagens pode estar em andamento.');
+        } else {
+          setError('Não foi possível carregar as opções de imagem. Por favor, tente novamente.');
+        }
       } finally {
         setLoading(false);
       }
@@ -61,6 +70,7 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({
 
   const handleSave = () => {
     if (selectedImage) {
+      // O caminho da imagem já está no formato correto (/questions/...)
       onImageSelected(selectedImage.url);
     }
   };
@@ -126,7 +136,7 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({
                             }`}
                           >
                             <img
-                              src={image.url}
+                              src={imageConfig.getFullImageUrl(image.url)}
                               alt={image.description}
                               className="w-full h-full object-cover"
                             />
@@ -163,7 +173,7 @@ const ImageSelector: React.FC<ImageSelectorProps> = ({
                   <h3 className="font-medium mb-2">Imagem selecionada:</h3>
                   <div className="flex items-start gap-4">
                     <img
-                      src={selectedImage.url}
+                      src={imageConfig.getFullImageUrl(selectedImage.url)}
                       alt={selectedImage.description}
                       className="w-32 h-18 object-cover rounded"
                     />

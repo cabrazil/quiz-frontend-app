@@ -5,6 +5,7 @@ import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../components/ui/card';
 import { Loader2 } from 'lucide-react';
 import ImageSelector from '../components/ImageSelector';
+import { imageConfig } from '../config/images';
 
 interface Question {
   id: number;
@@ -59,16 +60,18 @@ const ImageSelection: React.FC = () => {
     
     try {
       // Atualiza a questão com o caminho da imagem
-      await axios.put(`http://localhost:3000/api/questions/${selectedQuestion.id}`, {
+      const response = await axios.put(`http://localhost:3000/api/questions/${selectedQuestion.id}`, {
         scrImage: imagePath
       });
       
-      // Atualiza o estado local
+      // Atualiza o estado local com a resposta do servidor
+      const updatedQuestion = response.data;
+      
       setQuestions(questions.map(q => 
-        q.id === selectedQuestion.id ? { ...q, scrImage: imagePath } : q
+        q.id === selectedQuestion.id ? { ...q, scrImage: updatedQuestion.scrImage } : q
       ));
       
-      setSelectedQuestion({ ...selectedQuestion, scrImage: imagePath });
+      setSelectedQuestion({ ...selectedQuestion, scrImage: updatedQuestion.scrImage });
       setShowImageSelector(false);
     } catch (err) {
       console.error('Error updating question image:', err);
@@ -141,7 +144,7 @@ const ImageSelection: React.FC = () => {
                       <div className="mb-4">
                         <p className="text-sm font-medium mb-2">Imagem atual:</p>
                         <img 
-                          src={selectedQuestion.scrImage} 
+                          src={imageConfig.getFullImageUrl(selectedQuestion.scrImage)} 
                           alt="Imagem da questão" 
                           className="w-full h-40 object-cover rounded"
                         />
