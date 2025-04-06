@@ -84,7 +84,8 @@ const Quiz = () => {
           categoryId: q.categoryId,
           difficulty: q.difficulty,
           createdAt: q.createdAt,
-          updatedAt: q.updatedAt
+          updatedAt: q.updatedAt,
+          scrImage: q.scrImage
         }));
 
         setQuestions(formattedQuestions);
@@ -134,7 +135,8 @@ const Quiz = () => {
         categoryId: q.categoryId,
         difficulty: q.difficulty,
         createdAt: q.createdAt,
-        updatedAt: q.updatedAt
+        updatedAt: q.updatedAt,
+        scrImage: q.scrImage
       }));
 
       // Limita o número de questões ao solicitado

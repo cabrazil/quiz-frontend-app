@@ -259,17 +259,26 @@ export const QuizQuestion = ({
               {question.scrImage ? (
                 <div className="relative w-full aspect-square flex items-center justify-center overflow-hidden rounded-lg bg-card border-4 border-primary/30 shadow-md">
                   <img 
-                    src={question.scrImage.startsWith('/') ? question.scrImage : getQuestionImagePath(Number(question.id))} 
+                    src={imageConfig.getFullImageUrl(question.scrImage || '')} 
                     alt="Imagem da questão" 
                     className="absolute inset-0 w-full h-full object-cover bg-background"
                     style={{ objectPosition: 'left center' }}
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
-                      console.error('Erro ao carregar imagem:', target.src);
-                      target.src = imageConfig.defaultImage;
+                      console.error('Erro ao carregar imagem:', {
+                        src: target.src,
+                        questionId: question.id,
+                        scrImage: question.scrImage,
+                        fullUrl: imageConfig.getFullImageUrl(question.scrImage || '')
+                      });
+                      target.src = imageConfig.getFullImageUrl(imageConfig.defaultImage);
                     }}
                     onLoad={() => {
-                      console.log('Imagem carregada com sucesso:', question.scrImage);
+                      console.log('Imagem carregada com sucesso:', {
+                        src: question.scrImage,
+                        questionId: question.id,
+                        fullUrl: imageConfig.getFullImageUrl(question.scrImage || '')
+                      });
                     }}
                   />
                 </div>

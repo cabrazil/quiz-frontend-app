@@ -2,20 +2,27 @@
  * Configuração para gerenciamento de imagens do quiz
  */
 
+const API_URL = 'http://localhost:3000';
+
+// Configuração de imagens
+export const imageConfig = {
+  defaultImage: '/questions/default/image_1.jpg',
+  basePath: '/questions',
+  imageFormat: 'jpg',
+  imagePrefix: 'image_',
+  apiUrl: API_URL,
+  getFullImageUrl: (path: string) => {
+    if (!path) return `${API_URL}/questions/default/image_1.jpg`;
+    return path.startsWith('/') ? `${API_URL}${path}` : `${API_URL}/${path}`;
+  }
+};
+
 // Função para gerar o caminho da imagem de uma questão
 export const getQuestionImagePath = (questionId: number): string => {
-  return `/questions/${questionId}/image.jpg`;
+  return `${imageConfig.basePath}/${questionId}/${imageConfig.imagePrefix}1.${imageConfig.imageFormat}`;
 };
 
 // Função para validar se uma imagem existe
 export const validateImagePath = (path: string): boolean => {
-  // Aqui você pode adicionar validações adicionais se necessário
-  return path.startsWith('/questions/');
-};
-
-// Configurações de imagem
-export const imageConfig = {
-  maxSize: 5 * 1024 * 1024, // 5MB
-  allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
-  defaultImage: '/questions/default/image.jpg',
+  return path.startsWith(imageConfig.basePath);
 }; 

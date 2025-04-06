@@ -5,6 +5,7 @@ import { QuizConfig } from './components/QuizConfig';
 import { QuestionSelector } from './pages/QuestionSelector';
 import { TestConfig } from './pages/TestConfig';
 import { QuestionManagement } from './pages/QuestionManagement';
+import ImageSelection from './pages/ImageSelection';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/test" element={<TestConfig />} />
         <Route path="/select-questions" element={<QuestionSelector />} />
         <Route path="/question-management" element={<QuestionManagement />} />
+        <Route path="/image-selection" element={<ImageSelection />} />
       </Routes>
     </Router>
   );
