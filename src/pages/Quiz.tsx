@@ -8,6 +8,7 @@ import { QuizConfig } from '../components/QuizConfig';
 import { Button } from '../components/ui/button';
 import { AnimatePresence, motion } from 'framer-motion';
 import { QuizQuestion } from '../components/QuizQuestion';
+import { QuizQuestionAlt } from '../components/QuizQuestionAlt';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 interface QuizConfig {
@@ -34,6 +35,7 @@ const Quiz = () => {
   const [usedQuestionIds, setUsedQuestionIds] = useState<Set<string>>(new Set());
   const [quizName] = useState("Cuca Legal");
   const [sessionId, setSessionId] = useState<number | null>(null);
+  const [useAltLayout, setUseAltLayout] = useState(false);
 
   useEffect(() => {
     if (isTestMode && selectedQuestion) {
@@ -245,6 +247,10 @@ const Quiz = () => {
     }
   };
 
+  const toggleLayout = () => {
+    setUseAltLayout(!useAltLayout);
+  };
+
   if (!config && !isTestMode) {
     return <QuizConfig onStart={handleStart} />;
   }
@@ -319,18 +325,43 @@ const Quiz = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <QuizQuestion
-        question={currentQuestion}
-        onAnswer={handleAnswer}
-        timeLeft={timeLeft}
-        totalTime={10}
-        currentQuestion={currentQuestionIndex + 1}
-        totalQuestions={questions.length}
-        onTimeUp={handleTimeUp}
-        isTimerActive={isTimerActive}
-        onTick={setTimeLeft}
-        quizName={quizName}
-      />
+      <div className="flex justify-end mb-4">
+        <Button 
+          variant="outline" 
+          onClick={toggleLayout}
+          className="flex items-center gap-2"
+        >
+          {useAltLayout ? 'Layout Original' : 'Novo Layout'}
+        </Button>
+      </div>
+      
+      {useAltLayout ? (
+        <QuizQuestionAlt
+          question={currentQuestion}
+          onAnswer={handleAnswer}
+          timeLeft={timeLeft}
+          totalTime={10}
+          currentQuestion={currentQuestionIndex + 1}
+          totalQuestions={questions.length}
+          onTimeUp={handleTimeUp}
+          isTimerActive={isTimerActive}
+          onTick={setTimeLeft}
+          quizName={quizName}
+        />
+      ) : (
+        <QuizQuestion
+          question={currentQuestion}
+          onAnswer={handleAnswer}
+          timeLeft={timeLeft}
+          totalTime={10}
+          currentQuestion={currentQuestionIndex + 1}
+          totalQuestions={questions.length}
+          onTimeUp={handleTimeUp}
+          isTimerActive={isTimerActive}
+          onTick={setTimeLeft}
+          quizName={quizName}
+        />
+      )}
     </div>
   );
 };

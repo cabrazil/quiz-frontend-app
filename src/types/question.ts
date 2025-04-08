@@ -16,6 +16,8 @@ export interface Question {
   explanation?: string;
   source?: string;
   scrImage?: string;
+  imagePosition?: string;
+  imageScale?: number;
   createdAt: string;
   updatedAt: string;
 }
